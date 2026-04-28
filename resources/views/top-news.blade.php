@@ -61,6 +61,20 @@
         {{-- SIDEBAR --}}
         <div class="lg:col-span-1 flex flex-col gap-4">
 
+            {{-- Sidebar Ad --}}
+            @if(isset($activeAds) && $activeAds->where('placement', 'sidebar')->count() > 0)
+            @php
+                $sidebarAd = $activeAds->where('placement', 'sidebar')->random();
+            @endphp
+            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden p-3 mb-2">
+                <span class="text-[9px] text-gray-400 uppercase tracking-widest font-bold block mb-2 text-center">Advertisement</span>
+                <a href="{{ route('ads.click', $sidebarAd->id) }}" target="_blank" class="block relative group overflow-hidden rounded-xl">
+                    <img src="{{ asset($sidebarAd->image_url) }}" alt="{{ $sidebarAd->title }}" class="w-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors"></div>
+                </a>
+            </div>
+            @endif
+
             {{-- Trending --}}
             <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
                 <div class="bg-gradient-to-r from-red-600 to-red-700 px-4 py-3 flex items-center gap-2">
@@ -124,12 +138,25 @@
 
             {{-- Ad Banner every 8 items --}}
             @if($index > 0 && $index % 8 === 0)
-            <div class="col-span-full">
-                <div class="ad-banner">
-                    <span class="text-[9px] text-gray-500 uppercase tracking-widest font-bold block mb-2">Advertisement</span>
-                    <img src="https://picsum.photos/1200/120?random=ad{{ $index }}" class="w-full h-[90px] object-cover rounded-lg opacity-80 hover:opacity-100 transition-opacity" alt="Ad">
+                @if(isset($activeAds) && $activeAds->where('placement', 'in_article')->count() > 0)
+                @php
+                    $inArticleAd = $activeAds->where('placement', 'in_article')->random();
+                @endphp
+                <div class="col-span-full">
+                    <div class="ad-banner bg-white dark:bg-gray-900 p-2 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                        <span class="text-[9px] text-gray-500 uppercase tracking-widest font-bold block mb-2 text-center">Advertisement</span>
+                        <a href="{{ route('ads.click', $inArticleAd->id) }}" target="_blank" class="block relative group overflow-hidden rounded-xl">
+                            <img src="{{ asset($inArticleAd->image_url) }}" class="w-full h-[90px] md:h-[120px] object-cover opacity-90 group-hover:opacity-100 transition-opacity" alt="{{ $inArticleAd->title }}">
+                        </a>
+                    </div>
                 </div>
-            </div>
+                @else
+                <div class="col-span-full">
+                    <div class="ad-banner bg-gray-100 dark:bg-gray-800 p-2 rounded-2xl border border-gray-200 dark:border-gray-700 flex items-center justify-center h-[90px] md:h-[120px]">
+                        <span class="text-xs text-gray-400 font-bold uppercase tracking-widest">Space Iklan Tersedia</span>
+                    </div>
+                </div>
+                @endif
             @endif
 
             <x-news-card :item="$item" />

@@ -159,6 +159,20 @@
         </div>
     </nav>
 
+    {{-- ===== HEADER ADVERTISEMENT ===== --}}
+    @if(isset($activeAds) && $activeAds->where('placement', 'header')->count() > 0)
+    @php
+        $headerAd = $activeAds->where('placement', 'header')->random();
+    @endphp
+    <div class="container mx-auto px-4 mt-6 mb-2">
+        <a href="{{ route('ads.click', $headerAd->id) }}" target="_blank" class="block relative group overflow-hidden rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+            <img src="{{ asset($headerAd->image_url) }}" alt="{{ $headerAd->title }}" class="w-full h-24 md:h-32 object-cover group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"></div>
+            <span class="absolute top-2 right-2 bg-white/90 dark:bg-black/70 text-gray-800 dark:text-gray-200 text-[9px] font-bold px-2 py-0.5 rounded backdrop-blur-sm shadow-sm uppercase tracking-wider">Advertisement</span>
+        </a>
+    </div>
+    @endif
+
     {{-- ===== BREAKING TICKER ===== --}}
     @hasSection('breaking')
     <div class="bg-red-700 dark:bg-red-800 text-white py-2.5 overflow-hidden shadow-lg shadow-red-900/30">
@@ -241,10 +255,14 @@
                 <div>
                     <h5 class="font-bold text-white text-sm uppercase tracking-wider mb-4 pb-2 border-b border-white/10">Newsletter</h5>
                     <p class="text-gray-500 text-sm mb-4">Daftarkan email kamu untuk mendapat berita terpilih setiap hari.</p>
-                    <div class="flex flex-col gap-2">
-                        <input type="email" placeholder="email@kamu.com" class="bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors">
-                        <button class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors">Langganan Gratis</button>
-                    </div>
+                    <form action="{{ route('newsletter.subscribe') }}" method="POST" class="flex flex-col gap-2">
+                        @csrf
+                        <input type="email" name="email" required placeholder="email@kamu.com" class="bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors">
+                        @error('email')
+                            <span class="text-red-400 text-xs font-semibold">{{ $message }}</span>
+                        @enderror
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors">Langganan Gratis</button>
+                    </form>
                 </div>
             </div>
 

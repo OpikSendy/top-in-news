@@ -26,3 +26,30 @@ Route::post('/admin/news/delete/{id}', [NewsController::class, 'delete'])->name(
 Route::post('/admin/news/toggle/{id}', [NewsController::class, 'toggle'])->name('admin.news.toggle');
 Route::post('/admin/news/update-status/{id}', [NewsController::class, 'updateStatus'])->name('admin.news.updateStatus');
 Route::post('/comment/{id}', [NewsController::class, 'comment'])->name('comment.store');
+
+// 🔥 ADS ROUTES
+use App\Http\Controllers\AdvertisementController;
+
+Route::get('/ad/{id}/click', [AdvertisementController::class, 'trackClick'])->name('ads.click');
+
+Route::prefix('admin/ads')->name('admin.ads.')->group(function () {
+    Route::get('/', [AdvertisementController::class, 'index'])->name('index');
+    Route::get('/create', [AdvertisementController::class, 'create'])->name('create');
+    Route::post('/store', [AdvertisementController::class, 'store'])->name('store');
+    Route::get('/edit/{id}', [AdvertisementController::class, 'edit'])->name('edit');
+    Route::post('/update/{id}', [AdvertisementController::class, 'update'])->name('update');
+    Route::post('/delete/{id}', [AdvertisementController::class, 'destroy'])->name('delete');
+    Route::post('/toggle/{id}', [AdvertisementController::class, 'toggle'])->name('toggle');
+    Route::post('/update-posisi/{id}', [AdvertisementController::class, 'updatePosisi'])->name('updatePosisi');
+});
+
+// 🔥 NEWSLETTER ROUTES
+use App\Http\Controllers\SubscriberController;
+
+Route::post('/newsletter/subscribe', [SubscriberController::class, 'subscribe'])->name('newsletter.subscribe');
+
+Route::prefix('admin/subscribers')->name('admin.subscribers.')->group(function () {
+    Route::get('/', [SubscriberController::class, 'index'])->name('index');
+    Route::post('/toggle/{id}', [SubscriberController::class, 'toggle'])->name('toggle');
+    Route::post('/delete/{id}', [SubscriberController::class, 'destroy'])->name('delete');
+});
