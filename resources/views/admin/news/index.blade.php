@@ -102,8 +102,7 @@
                                 <td class="px-5 py-3 text-gray-400 text-xs">
                                     {{ $loop->iteration + ($news->currentPage() - 1) * $news->perPage() }}</td>
                                 <td class="px-5 py-3">
-                                    <img src="https://picsum.photos/80/60?random={{ $item->id }}"
-                                        class="w-12 h-9 rounded-lg object-cover">
+                                    <img src="{{ Str::startsWith($item->image, 'http') ? $item->image : asset('storage/' . $item->image) }}" class="w-12 h-9 rounded-lg object-cover">
                                 </td>
                                 <td class="px-5 py-3">
                                     <div class="flex items-center gap-2">

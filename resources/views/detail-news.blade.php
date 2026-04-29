@@ -12,16 +12,16 @@
 
 @section('structured_data')
     <script type="application/ld+json">
-    {
-      "@@context": "https://schema.org",
-      "@@type": "NewsArticle",
-      "headline": "{{ $news->title }}",
-      "image": "https://picsum.photos/1200/630?random={{ $news->id }}",
-      "datePublished": "{{ $news->created_at->toISOString() }}",
-      "dateModified": "{{ $news->updated_at->toISOString() }}",
-      "articleSection": "{{ $news->category }}"
-    }
-    </script>
+                                            {
+                                              "@@context": "https://schema.org",
+                                              "@@type": "NewsArticle",
+                                              "headline": "{{ $news->title }}",
+                                              "image": "https://picsum.photos/1200/630?random={{ $news->id }}",
+                                              "datePublished": "{{ $news->created_at->toISOString() }}",
+                                              "dateModified": "{{ $news->updated_at->toISOString() }}",
+                                              "articleSection": "{{ $news->category }}"
+                                            }
+                                            </script>
 @endsection
 
 @section('content')
@@ -163,11 +163,8 @@
 
                 {{-- Hero Image --}}
                 <figure class="mb-8 rounded-2xl overflow-hidden shadow-xl">
-                    <img src="https://picsum.photos/900/500?random={{ $news->id }}" alt="{{ $news->title }}"
+                    <img src="{{ Str::startsWith($news->image, 'http') ? $news->image : asset('storage/' . $news->image) }}"
                         class="w-full h-auto object-cover max-h-[500px]">
-                    <figcaption class="text-xs text-gray-400 text-center py-2 px-4 bg-gray-50 dark:bg-gray-900">
-                        Foto: Ilustrasi — {{ $news->category }} / Top In News
-                    </figcaption>
                 </figure>
 
                 {{-- Article Summary --}}
@@ -289,7 +286,7 @@
                                 @foreach($related as $item)
                                     <a href="{{ route('detail-news', $item->id) }}" class="group block">
                                         <div class="overflow-hidden rounded-xl mb-2 aspect-video bg-gray-100 dark:bg-gray-800">
-                                            <img src="https://picsum.photos/400/200?random={{ $item->id }}"
+                                            <img src="{{ Str::startsWith($item->image, 'http') ? $item->image : asset('storage/' . $item->image) }}"
                                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                                                 loading="lazy" alt="{{ $item->title }}">
                                         </div>

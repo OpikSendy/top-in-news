@@ -25,6 +25,25 @@
     <form action="{{ route('admin.news.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
 
+        {{-- SCRAPING CARD --}}
+        <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-2xl p-5 shadow-sm">
+            <h2 class="text-sm font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-3 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                Auto-Fill dari URL (Scraping)
+            </h2>
+            <div class="flex gap-3">
+                <input type="url" id="scrape-url" placeholder="Masukkan URL artikel (contoh: https://www.liputan6.com/...)" class="flex-1 text-sm px-4 py-2.5 rounded-xl border border-indigo-200 dark:border-indigo-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <button type="button" id="btn-scrape" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-lg shadow-indigo-600/25 flex items-center gap-2 text-sm whitespace-nowrap">
+                    <span>Sedot Data</span>
+                    <svg id="scrape-spinner" class="animate-spin h-4 w-4 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+            <p id="scrape-msg" class="text-xs mt-2 hidden"></p>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             {{-- MAIN CONTENT --}}
@@ -162,6 +181,76 @@ document.getElementById('image-upload').addEventListener('change', function () {
             document.getElementById('image-preview').classList.remove('hidden');
         };
         reader.readAsDataURL(file);
+    }
+});
+
+// Scraping Logic
+document.getElementById('btn-scrape').addEventListener('click', async function () {
+    const urlInput = document.getElementById('scrape-url');
+    const url = urlInput.value.trim();
+    const btn = this;
+    const spinner = document.getElementById('scrape-spinner');
+    const msg = document.getElementById('scrape-msg');
+
+    if (!url) {
+        alert('Masukkan URL terlebih dahulu!');
+        return;
+    }
+
+    // Ubah UI loading
+    btn.disabled = true;
+    spinner.classList.remove('hidden');
+    msg.classList.remove('hidden', 'text-green-600', 'text-red-600', 'dark:text-green-400', 'dark:text-red-400');
+    msg.classList.add('text-indigo-600', 'dark:text-indigo-400');
+    msg.innerText = '⏳ Sedang menyedot data dari URL...';
+
+    try {
+        const response = await fetch('{{ route("admin.news.scrape") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ url: url })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Terjadi kesalahan saat scraping');
+        }
+
+        // Isi form
+        if (data.title) {
+            document.querySelector('input[name="title"]').value = data.title;
+        }
+
+        if (data.image) {
+            document.querySelector('input[name="image"]').value = data.image;
+            document.getElementById('preview-img').src = data.image;
+            document.getElementById('image-preview').classList.remove('hidden');
+        }
+
+        if (data.content) {
+            // Bersihkan Quill sebelum isi baru
+            quill.clipboard.dangerouslyPasteHTML(data.content);
+        }
+
+        // Sukses
+        msg.classList.remove('text-indigo-600', 'dark:text-indigo-400');
+        msg.classList.add('text-green-600', 'dark:text-green-400');
+        msg.innerText = '✅ Berhasil menyedot data! Silakan periksa dan edit kembali jika perlu.';
+    } catch (error) {
+        // Gagal
+        msg.classList.remove('text-indigo-600', 'dark:text-indigo-400');
+        msg.classList.add('text-red-600', 'dark:text-red-400');
+        msg.innerText = '❌ Gagal: ' + error.message;
+        console.error('Scraping Error:', error);
+    } finally {
+        // Kembalikan UI
+        btn.disabled = false;
+        spinner.classList.add('hidden');
     }
 });
 </script>

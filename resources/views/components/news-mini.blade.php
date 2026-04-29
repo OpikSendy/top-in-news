@@ -4,7 +4,7 @@
 
     {{-- Thumbnail --}}
     <div class="shrink-0 w-20 h-16 rounded-lg overflow-hidden relative">
-        <img src="https://picsum.photos/120/90?random={{ $item->id }}"
+        <img src="{{ Str::startsWith($item->image, 'http') ? $item->image : asset('storage/' . $item->image) }}"
              alt="{{ $item->title }}"
              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
              loading="lazy">

@@ -20,6 +20,7 @@ Route::get('/trending', [NewsController::class, 'trending'])->name('trending');
 Route::get('/admin/news', [NewsController::class, 'adminIndex'])->name('admin.news.index');
 Route::get('/admin/news/create', [NewsController::class, 'create'])->name('admin.news.create');
 Route::post('/admin/news/store', [NewsController::class, 'store'])->name('admin.news.store');
+Route::post('/admin/news/scrape', [NewsController::class, 'scrapeArticle'])->name('admin.news.scrape');
 Route::get('/admin/news/edit/{id}', [NewsController::class, 'edit'])->name('admin.news.edit');
 Route::post('/admin/news/update/{id}', [NewsController::class, 'update'])->name('admin.news.update');
 Route::post('/admin/news/delete/{id}', [NewsController::class, 'delete'])->name('admin.news.delete');
